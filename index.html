@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://sdk.minepi.com; script-src 'self' 'unsafe-inline' https://sdk.minepi.com">
+<title>جسر Pi</title>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#080e1a;--card:#0c1525;--card2:#101e30;
+  --border:#1a3050;--accent:#00d4ff;--blue:#0077cc;
+  --text:#e8f0f8;--sub:#6a8aaa;--gold:#ffc107;
+  --green:#00c06b;--r:15px
+}
+body{background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
+.header{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.logo{width:42px;height:42px;background:linear-gradient(135deg,#0d3060,#0077cc);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--accent)}
+.htitle h1{font-size:21px;font-weight:800}
+.htitle h1 span{color:var(--accent)}
+.htitle p{font-size:11px;color:var(--sub);text-align:center}
+.main{padding:16px;padding-bottom:90px}
+.page{display:none}
+.page.active{display:block}
+.ptitle{font-size:24px;font-weight:800;text-align:right;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-family:inherit;font-weight:700;width:100%}
+.btn-p{background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff}
+.btn-g{background:linear-gradient(135deg,#e67c00,var(--gold));color:#000}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}
+.sb{display:flex;align-items:center;gap:10px;background:#0e1e35;border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.sb-l{flex:1;font-size:13px;color:var(--sub)}
+.sb-b{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.sc{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.si{font-size:26px;margin-bottom:6px}
+.sv{font-size:19px;font-weight:800}
+.sl{font-size:11px;color:var(--sub);margin-top:3px}
+.lc{display:flex;align-items:center;gap:12px}
+.li{flex:1;text-align:right}
+.li h3{font-size:17px;font-weight:700}
+.li p{font-size:12px;color:var(--sub);margin-top:4px}
+.avi{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.lb{background:linear-gradient(135deg,#0a3d8f,#1565c0);color:#fff;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700;white-space:nowrap}
+.ub{display:inline-flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.feat{background:linear-gradient(135deg,#0c1a30,#112240);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.fhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ftitle{font-size:17px;font-weight:800;color:var(--gold)}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#152a45;color:#90bff0}
+.pi-item{display:flex;gap:12px;align-items:flex-start}
+.pico{width:54px;height:54px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.pn{font-size:16px;font-weight:700;margin-bottom:3px}
+.pc{font-size:12px;color:var(--sub);margin-bottom:7px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tag{background:var(--card2);border:1px solid var(--border);padding:3px 10px;border-radius:20px;font-size:11px}
+.tg{background:#241a00;color:var(--gold);border-color:#6b4c00}
+.amts{display:flex;justify-content:space-between;margin-top:10px}
+.ai{text-align:center}
+.av2{font-size:15px;font-weight:800}
+.av2.cy{color:var(--accent)}
+.al{font-size:11px;color:var(--sub)}
+.prog{background:var(--card2);border-radius:10px;height:7px;margin:10px 0;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:10px}
+.filt{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.filt::-webkit-scrollbar{display:none}
+.ft{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--sub);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.ft.active{background:var(--blue);border-color:var(--accent);color:#fff}
+.cl{display:block;text-align:right;color:var(--sub);font-size:14px;margin-bottom:7px}
+.ci{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-size:16px;font-family:inherit;text-align:right;outline:none;margin-bottom:14px}
+.ci:focus{border-color:var(--accent)}
+.cr2{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:4px 16px;margin:14px 0}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.rr:last-child{border-bottom:none}
+.rl{color:var(--sub);font-size:14px}
+.rv{font-size:19px;font-weight:800;color:var(--accent)}
+.fl{display:block;text-align:right;color:var(--sub);font-size:14px;margin-bottom:7px}
+.fi,.fs,.fta{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-size:15px;font-family:inherit;text-align:right;outline:none;direction:rtl;margin-bottom:14px}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--accent)}
+.fta{min-height:100px;resize:vertical}
+.sw{position:relative}
+.sw::after{content:"▾";position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);pointer-events:none}
+.sw .fs{appearance:none;cursor:pointer}
+.pav{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 16px}
+.ir{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.ir:last-child{border-bottom:none}
+.ik{color:var(--sub)}
+.empty{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:40px 20px;text-align:center;color:var(--sub)}
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);background:#0c2e1a;border:1px solid #1a5c32;color:#7ef0a0;padding:12px 22px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:90vw;text-align:center;pointer-events:none}
+.toast.show{opacity:1}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.mo.show{display:flex}
+.md{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:480px}
+.mt{font-size:20px;font-weight:800;text-align:center;margin-bottom:18px}
+.id{background:var(--card2);border:2px solid var(--accent);border-radius:14px;padding:20px;text-align:center;margin-bottom:18px}
+.id .big{font-size:38px;font-weight:900;color:var(--accent)}
+.id .cur{font-size:14px;color:var(--sub);margin-top:4px}
+.tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 18px;z-index:200}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 14px;border-radius:10px;border:none;background:none;color:var(--sub);font-family:inherit}
+.tab.active{color:var(--accent)}
+.ti{font-size:21px}
+.tl{font-size:10px}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sh h3{font-size:17px;font-weight:700}
+.sh-btn{background:transparent;border:1px solid var(--border);color:var(--sub);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- Investment Modal -->
+<div class="mo" id="mo">
+  <div class="md">
+    <div class="mt">🪙 الاستثمار في المشروع</div>
+    <div id="mpn" style="text-align:center;color:var(--sub);margin-bottom:16px;font-size:15px"></div>
+    <label class="cl">مبلغ الاستثمار (Pi)</label>
+    <input class="ci" type="number" id="ma" value="100" min="1">
+    <div class="id">
+      <div class="big" id="ms">100</div>
+      <div class="cur">Pi Coin</div>
+    </div>
+    <button class="btn btn-p" id="btnConfirmInvest">🔐 تأكيد الدفع بـ Pi</button>
+    <button class="btn btn-o" id="btnCloseModal" style="margin-top:10px">إلغاء</button>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">ج</div>
+  <div class="htitle">
+    <h1><span>Pi</span> جسر</h1>
+    <p>Pi Jisr</p>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="sb">
+      <span class="sb-l">✏️ وضع اختبار تجريبي</span>
+      <button class="sb-b" id="btnSandbox">حساب تجريبي</button>
+    </div>
+    <div class="card lc" id="loginCard">
+      <div class="li"><h3>مرحباً بك</h3><p>سجل الدخول للوصول لجميع الميزات</p></div>
+      <div class="avi">👤</div>
+      <button class="lb" id="btnLogin">دخول</button>
+    </div>
+    <div class="card" id="userCard" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="ub"><span class="dot"></span><span id="homeUser">مستخدم</span></div>
+          <p style="color:var(--sub);font-size:13px;margin-top:8px">مرحباً بك في جسر Pi 🎉</p>
+        </div>
+        <div style="font-size:38px">👤</div>
+      </div>
+    </div>
+    <div class="sgrid">
+      <div class="sc"><div class="si">👥</div><div class="sv">1.2K</div><div class="sl">مستثمر</div></div>
+      <div class="sc"><div class="si">💰</div><div class="sv">$2.4M</div><div class="sl">استثمارات</div></div>
+      <div class="sc"><div class="si">📊</div><div class="sv" id="projCount">0</div><div class="sl">مشروع نشط</div></div>
+    </div>
+    <div class="feat">
+      <div class="fhdr">
+        <div class="ftitle">⭐ فرصة الأسبوع</div>
+        <span class="badge">● متوسط</span>
+      </div>
+      <div class="pi-item">
+        <div class="pico">🤖</div>
+        <div>
+          <div class="pn">تطبيق الذكاء الاصطناعي</div>
+          <div class="pc">التكنولوجيا</div>
+          <div class="tags">
+            <span class="tag tg">★ 4.8</span>
+            <span class="tag">AI</span>
+            <span class="tag">أسهم</span>
+          </div>
+        </div>
+      </div>
+      <div class="prog"><div class="pf" style="width:64%"></div></div>
+      <div class="amts">
+        <div class="ai"><div class="av2">$500K</div><div class="al">الهدف</div></div>
+        <div class="ai"><div class="av2 cy">64%</div><div class="al">مكتمل</div></div>
+        <div class="ai"><div class="av2">$320K</div><div class="al">تم جمعه</div></div>
+      </div>
+      <button class="btn btn-g" id="btnFeaturedInvest" style="margin-top:14px">🪙 استثمر الآن</button>
+    </div>
+    <div class="sh">
+      <button class="sh-btn" id="btnViewAll">عرض الكل</button>
+      <h3>أحدث المشاريع</h3>
+    </div>
+    <div id="homeProjs"><div class="empty">لا توجد مشاريع بعد. ابدأ بإنشاء أول مشروع! 🚀</div></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="ptitle">المشاريع</div>
+    <div class="filt">
+      <button class="ft active" data-cat="all">الكل</button>
+      <button class="ft" data-cat="تكنولوجيا">💻 تكنولوجيا</button>
+      <button class="ft" data-cat="تعليم">📚 تعليم</button>
+      <button class="ft" data-cat="صحة">🏥 صحة</button>
+      <button class="ft" data-cat="تجارة">🛒 تجارة</button>
+      <button class="ft" data-cat="زراعة">🌱 زراعة</button>
+    </div>
+    <div id="projList"><div class="empty">لا توجد مشاريع بعد</div></div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="page" id="page-calc">
+    <div class="ptitle">🧮 حاسبة الأرباح</div>
+    <div class="card">
+      <label class="cl">الاستثمار الأولي (Pi)</label>
+      <input class="ci" type="number" id="ca" value="1000">
+      <label class="cl">العائد السنوي (%)</label>
+      <input class="ci" type="number" id="cr" value="12.0" step="0.5">
+      <label class="cl">السنوات</label>
+      <input class="ci" type="number" id="cy" value="5">
+      <div class="cr2">
+        <div class="rr"><div class="rv" id="cp">Pi 600.00</div><div class="rl">الربح</div></div>
+        <div class="rr"><div class="rv" id="ct">Pi 1600.00</div><div class="rl">المبلغ النهائي</div></div>
+      </div>
+      <button class="btn btn-o" id="btnResetCalc">إعادة تعيين</button>
+    </div>
+  </div>
+
+  <!-- CREATE -->
+  <div class="page" id="page-create">
+    <div class="ptitle">إنشاء مشروع</div>
+    <div class="card">
+      <label class="fl">اسم المشروع</label>
+      <input class="fi" type="text" id="fn" placeholder="مثال: منصة تعليمية">
+      <label class="fl">التصنيف</label>
+      <div class="sw">
+        <select class="fs" id="fc">
+          <option value="تكنولوجيا">💻 التكنولوجيا</option>
+          <option value="تعليم">📚 التعليم</option>
+          <option value="صحة">🏥 الصحة</option>
+          <option value="تجارة">🛒 التجارة</option>
+          <option value="زراعة">🌱 الزراعة</option>
+          <option value="طاقة">⚡ الطاقة</option>
+          <option value="أخرى">📦 أخرى</option>
+        </select>
+      </div>
+      <label class="fl">الهدف التمويلي ($)</label>
+      <input class="fi" type="number" id="fg" placeholder="مثال: 250000">
+      <label class="fl">وصف المشروع</label>
+      <textarea class="fta" id="fd" placeholder="اكتب وصفاً موجزاً..."></textarea>
+      <button class="btn btn-p" id="btnPublish">🚀 نشر المشروع</button>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div class="ptitle">الملف الشخصي</div>
+    <div id="profGuest" class="card" style="text-align:center;padding:40px 20px">
+      <div style="font-size:70px;margin-bottom:14px">π</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px">غير مسجل الدخول</div>
+      <div style="color:var(--sub);margin-bottom:24px">سجل الدخول للوصول إلى ملفك</div>
+      <button class="btn btn-p" id="btnLoginProfile">🔐 تسجيل الدخول بـ Pi</button>
+    </div>
+    <div id="profUser" style="display:none">
+      <div class="card" style="text-align:center;padding:24px">
+        <div class="pav">👤</div>
+        <div style="font-size:22px;font-weight:800" id="profName">مستخدم</div>
+        <div style="color:var(--sub);font-size:14px;margin-top:4px">@<span id="profHandle">username</span></div>
+        <div class="ub" style="margin:12px auto;display:inline-flex"><span class="dot"></span>مستثمر نشط</div>
+      </div>
+      <div class="card">
+        <div class="ir"><div class="ik">مشاريعي</div><div id="myProjCount">0</div></div>
+        <div class="ir"><div class="ik">إجمالي الاستثمار</div><div style="color:var(--accent)" id="myTotal">0 Pi</div></div>
+        <div class="ir"><div class="ik">الحالة</div><div style="color:var(--green)">نشط ✓</div></div>
+      </div>
+      <button class="btn btn-o" id="btnLogout">تسجيل الخروج</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab" data-page="profile"><span class="ti">⊙</span><span class="tl">ملف</span></button>
+  <button class="tab" data-page="create"><span class="ti">＋</span><span class="tl">إنشاء</span></button>
+  <button class="tab" data-page="calc"><span class="ti">🧮</span><span class="tl">حاسبة</span></button>
+  <button class="tab" data-page="projects"><span class="ti">⊞</span><span class="tl">مشاريع</span></button>
+  <button class="tab active" data-page="home"><span class="ti">⌂</span><span class="tl">الرئيسية</span></button>
+</div>
+
+<script>
+var user = null;
+var projects = [];
+var activeFilter = 'all';
+var investTarget = null;
+var totalInvested = 0;
+
+var ICONS = {'تكنولوجيا':'💻','تعليم':'📚','صحة':'🏥','تجارة':'🛒','زراعة':'🌱','طاقة':'⚡','أخرى':'📦'};
+
+// ── Init ──────────────────────────────────
+window.addEventListener('load', function() {
+  try { Pi.init({ version: "2.0", sandbox: true }); } catch(e) { console.warn('Pi SDK:', e); }
+  loadData();
+  bindEvents();
+  renderAll();
+  calcProfit();
+});
+
+// ── Data ──────────────────────────────────
+function loadData() {
+  try {
+    var s = localStorage.getItem('jisr_data');
+    if (s) { var d = JSON.parse(s); projects = d.p || []; totalInvested = d.i || 0; }
+  } catch(e) {}
+}
+function saveData() {
+  try { localStorage.setItem('jisr_data', JSON.stringify({p: projects, i: totalInvested})); } catch(e) {}
+}
+
+// ── Bind All Events ───────────────────────
+function bindEvents() {
+
+  // Tab navigation
+  document.querySelectorAll('.tab[data-page]').forEach(function(btn) {
+    btn.addEventListener('click', function() { showPage(this.getAttribute('data-page')); });
+  });
+
+  // Filter tabs
+  document.querySelectorAll('.ft[data-cat]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.ft').forEach(function(t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+      activeFilter = btn.getAttribute('data-cat');
+      renderProjList();
+    });
+  });
+
+  // Login buttons
+  var btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) btnLogin.addEventListener('click', loginWithPi);
+
+  var btnLoginProfile = document.getElementById('btnLoginProfile');
+  if (btnLoginProfile) btnLoginProfile.addEventListener('click', loginWithPi);
+
+  var btnLogout = document.getElementById('btnLogout');
+  if (btnLogout) btnLogout.addEventListener('click', logout);
+
+  // Home buttons
+  var btnSandbox = document.getElementById('btnSandbox');
+  if (btnSandbox) btnSandbox.addEventListener('click', function() { showToast('افتح Pi Browser وانتقل للـ Sandbox'); });
+
+  var btnViewAll = document.getElementById('btnViewAll');
+  if (btnViewAll) btnViewAll.addEventListener('click', function() { showPage('projects'); });
+
+  var btnFeatured = document.getElementById('btnFeaturedInvest');
+  if (btnFeatured) btnFeatured.addEventListener('click', function() { openModal('featured', 'تطبيق الذكاء الاصطناعي'); });
+
+  // Modal
+  var btnClose = document.getElementById('btnCloseModal');
+  if (btnClose) btnClose.addEventListener('click', closeModal);
+
+  var btnConfirm = document.getElementById('btnConfirmInvest');
+  if (btnConfirm) btnConfirm.addEventListener('click', confirmInvest);
+
+  var mo = document.getElementById('mo');
+  if (mo) mo.addEventListener('click', function(e) { if (e.target === mo) closeModal(); });
+
+  // Investment amount input
+  var ma = document.getElementById('ma');
+  if (ma) ma.addEventListener('input', function() {
+    var ms = document.getElementById('ms');
+    if (ms) ms.textContent = this.value || '0';
+  });
+
+  // Calculator inputs
+  ['ca','cr','cy'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', calcProfit);
+  });
+
+  var btnReset = document.getElementById('btnResetCalc');
+  if (btnReset) btnReset.addEventListener('click', function() {
+    document.getElementById('ca').value = '1000';
+    document.getElementById('cr').value = '12.0';
+    document.getElementById('cy').value = '5';
+    calcProfit();
+  });
+
+  // Publish project
+  var btnPublish = document.getElementById('btnPublish');
+  if (btnPublish) btnPublish.addEventListener('click', publishProject);
+}
+
+// ── Navigation ────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  var pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  var tab = document.querySelector('.tab[data-page="' + page + '"]');
+  if (tab) tab.classList.add('active');
+}
+
+// ── Pi Auth ───────────────────────────────
+function loginWithPi() {
+  showToast('جاري الاتصال بـ Pi...');
+  Pi.authenticate(['username', 'payments'], function(pay) {
+    console.log('Incomplete payment:', pay);
+  }).then(function(res) {
+    user = res.user;
+    updateUserUI();
+    showToast('مرحباً ' + user.username + ' ✓');
+  }).catch(function(err) {
+    console.error('Auth error:', err);
+    showToast('فشل تسجيل الدخول. حاول مجدداً');
+  });
+}
+
+function logout() {
+  user = null;
+  updateUserUI();
+  showToast('تم تسجيل الخروج');
+}
+
+function updateUserUI() {
+  var on = !!user;
+  document.getElementById('loginCard').style.display = on ? 'none' : '';
+  document.getElementById('userCard').style.display = on ? '' : 'none';
+  document.getElementById('profGuest').style.display = on ? 'none' : '';
+  document.getElementById('profUser').style.display = on ? '' : 'none';
+  if (on) {
+    document.getElementById('homeUser').textContent = user.username;
+    document.getElementById('profName').textContent = user.username;
+    document.getElementById('profHandle').textContent = user.username;
+    updateProfileStats();
+  }
+}
+
+function updateProfileStats() {
+  var mine = user ? projects.filter(function(p) { return p.o === user.username; }) : [];
+  document.getElementById('myProjCount').textContent = mine.length;
+  document.getElementById('myTotal').textContent = totalInvested.toFixed(2) + ' Pi';
+}
+
+// ── Investment Modal ──────────────────────
+function openModal(id, name) {
+  if (!user) { showToast('يرجى تسجيل الدخول أولاً 🔐'); showPage('profile'); return; }
+  investTarget = id;
+  document.getElementById('mpn').textContent = name;
+  document.getElementById('ma').value = '100';
+  document.getElementById('ms').textContent = '100';
+  document.getElementById('mo').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('mo').classList.remove('show');
+  investTarget = null;
+}
+
+function confirmInvest() {
+  var amt = parseFloat(document.getElementById('ma').value);
+  if (!amt || amt <= 0) { showToast('يرجى إدخال مبلغ صحيح'); return; }
+  if (!user) { showToast('يرجى تسجيل الدخول أولاً'); return; }
+  var name = document.getElementById('mpn').textContent;
+  var tid = investTarget;
+  closeModal();
+  showToast('جاري معالجة الدفع...');
+
+  Pi.createPayment({
+    amount: amt,
+    memo: 'استثمار: ' + name,
+    metadata: { projectId: tid, investor: user.username }
+  }, {
+    onReadyForServerApproval: function(pid) {
+      fetch('/approve', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({paymentId: pid})
+      }).catch(function(e) { console.warn('Approve:', e); });
+    },
+    onReadyForServerCompletion: function(pid, txid) {
+      fetch('/complete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({paymentId: pid, txid: txid})
+      }).catch(function(e) { console.warn('Complete:', e); });
+      if (tid !== 'featured') {
+        var p = projects.find(function(x) { return x.id === tid; });
+        if (p) p.r = (p.r || 0) + amt;
+      }
+      totalInvested += amt;
+      saveData(); renderAll();
+      if (user) updateProfileStats();
+      showToast('🎉 تم الاستثمار بنجاح! شكراً لك');
+    },
+    onCancel: function() { showToast('تم إلغاء الدفع'); },
+    onError: function(e) { console.error(e); showToast('حدث خطأ في الدفع'); }
+  });
+}
+
+// ── Projects ──────────────────────────────
+function renderAll() {
+  document.getElementById('projCount').textContent = projects.length;
+  renderHomeProjs();
+  renderProjList();
+}
+
+function renderHomeProjs() {
+  var list = projects.slice(-3).reverse();
+  renderList(list, 'homeProjs');
+}
+
+function renderProjList() {
+  var list = activeFilter === 'all' ? projects : projects.filter(function(p) { return p.cat === activeFilter; });
+  renderList(list.slice().reverse(), 'projList');
+}
+
+function renderList(list, cid) {
+  var c = document.getElementById(cid);
+  if (!c) return;
+  if (!list.length) { c.innerHTML = '<div class="empty">لا توجد مشاريع بعد</div>'; return; }
+  c.innerHTML = list.map(function(p) {
+    var ico = ICONS[p.cat] || '📦';
+    var goal = p.goal || 0, raised = p.r || 0;
+    var pct = goal > 0 ? Math.min(100, Math.round(raised / goal * 100)) : 0;
+    return '<div class="card" style="margin-bottom:12px" data-pid="' + esc(p.id) + '" data-pname="' + esc(p.name) + '">' +
+      '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px">' +
+      '<div class="pico">' + ico + '</div>' +
+      '<div style="flex:1"><div class="pn">' + esc(p.name) + '</div>' +
+      '<div style="font-size:12px;color:var(--sub)">' + esc(p.cat) + '</div>' +
+      (p.desc ? '<div style="font-size:12px;color:var(--sub);margin-top:4px">' + esc(p.desc) + '</div>' : '') +
+      '</div></div>' +
+      '<div class="prog"><div class="pf" style="width:' + pct + '%"></div></div>' +
+      '<div class="amts">' +
+      '<div class="ai"><div class="av2">$' + fmt(goal) + '</div><div class="al">الهدف</div></div>' +
+      '<div class="ai"><div class="av2 cy">' + pct + '%</div><div class="al">مكتمل</div></div>' +
+      '<div class="ai"><div class="av2">$' + fmt(raised) + '</div><div class="al">تم جمعه</div></div>' +
+      '</div>' +
+      '<button class="btn btn-g invest-btn" style="margin-top:12px">🪙 استثمر الآن</button>' +
+      '</div>';
+  }).join('');
+
+  // Bind invest buttons after render
+  c.querySelectorAll('.invest-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('[data-pid]');
+      openModal(card.getAttribute('data-pid'), card.getAttribute('data-pname'));
+    });
+  });
+}
+
+function publishProject() {
+  if (!user) { showToast('يرجى تسجيل الدخول أولاً 🔐'); showPage('profile'); return; }
+  var name = document.getElementById('fn').value.trim();
+  var cat = document.getElementById('fc').value;
+  var goal = parseFloat(document.getElementById('fg').value);
+  var desc = document.getElementById('fd').value.trim();
+  if (!name) { showToast('يرجى إدخال اسم المشروع'); return; }
+  if (!goal || goal <= 0) { showToast('يرجى إدخال الهدف التمويلي'); return; }
+  projects.push({id: 'p' + Date.now(), name: name, cat: cat, goal: goal, r: 0, desc: desc, o: user.username});
+  saveData(); renderAll();
+  document.getElementById('fn').value = '';
+  document.getElementById('fg').value = '';
+  document.getElementById('fd').value = '';
+  showToast('🚀 تم نشر المشروع بنجاح!');
+  showPage('projects');
+}
+
+// ── Calculator ────────────────────────────
+function calcProfit() {
+  var a = parseFloat(document.getElementById('ca').value) || 0;
+  var r = parseFloat(document.getElementById('cr').value) || 0;
+  var y = parseFloat(document.getElementById('cy').value) || 0;
+  var profit = a * (r / 100) * y;
+  document.getElementById('cp').textContent = 'Pi ' + profit.toFixed(2);
+  document.getElementById('ct').textContent = 'Pi ' + (a + profit).toFixed(2);
+}
+
+// ── Helpers ───────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmt(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return String(n);
+}
+</script>
+</body>
+</html>
